@@ -8,7 +8,8 @@
 from circuits.core.components import BaseComponent
 import os
 import logging
-from circuits_bricks.app import Logger, Log, Configuration
+from circuits_bricks.app.logger import Logger, Log
+from circuits_bricks.app.config import Configuration
 
 DEFAULT_CONFIG = {
     "logging": {
