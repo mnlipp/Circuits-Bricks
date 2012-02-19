@@ -22,10 +22,10 @@ DEFAULT_CONFIG = {
 class Application(BaseComponent):
     """
     The application component is intended to be used as root component
-    of an application. It creates a :class:`util.config.Configuration`
+    of an application. It creates a :class:`circuits_bricks.app.Configuration`
     and a :class:`util.logger.Logger` child component.
     
-    The ``Application`` component creates an application directory 
+    The :class``Application`` component creates an application directory 
     (as hidden directory
     in the user's home directory, using the provided application name).
     The configuration is stored as file ``config`` in that directory.

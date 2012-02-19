@@ -12,9 +12,10 @@ import os
 import sys
 
 try:
-    import ConfigParser
+    from configparser import ConfigParser
 except ImportError:
-    import ConfigParser
+    from ConfigParser import ConfigParser
+
 
 class ConfigValue(Event):
     """
@@ -39,7 +40,7 @@ class ConfigValue(Event):
 
 class EmitConfig(Event):
     """
-    This event causes the ``Configuration`` to emit the configuration
+    This event causes the :class:``Configuration`` to emit the configuration
     values.
     """
     
