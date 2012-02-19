@@ -12,9 +12,9 @@ import os
 import sys
 
 try:
-    from configparser import ConfigParser
+    from configparser import ConfigParser, SafeConfigParser
 except ImportError:
-    from ConfigParser import ConfigParser
+    from ConfigParser import ConfigParser, SafeConfigParser
 
 
 class ConfigValue(Event):
@@ -102,7 +102,7 @@ class Configuration(BaseComponent):
         self._emit_done = False
 
         self._filename = filename
-        self._config = ConfigParser.SafeConfigParser(defaults=defaults)
+        self._config = SafeConfigParser(defaults=defaults)
         self._config.optionxform = str
         if os.path.exists(filename):
             self._config.read(filename)
