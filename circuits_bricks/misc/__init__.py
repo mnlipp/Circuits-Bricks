@@ -5,3 +5,4 @@
 
 .. moduleauthor:: mnl
 """
+from .compquery import *
