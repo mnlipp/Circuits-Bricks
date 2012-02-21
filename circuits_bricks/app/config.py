@@ -53,7 +53,7 @@ class Configuration(BaseComponent):
     """
     This component provides a repository for configuration values.
     
-    The component reads the initial configuration values from a
+    The component reads the initial configuration values from an
     ini-style configuration file when created. During application bootstrap,
     it intercepts the ``started`` event with a filter with  priority 999999.
     After receiving the ``started`` event, it fires all known configuration 

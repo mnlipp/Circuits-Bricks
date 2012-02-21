@@ -32,12 +32,19 @@ class Application(BaseComponent):
     
     The ``Logger`` is configured as specified by the configuration.
     The default configuration specifies a logger that logs to a 
-    file ``application.log`` in the application directory. 
+    file ``application.log`` in the application directory.
     """
     
     channel="application"
+    """The component's channel (defaults to ``application``)."""
     
     def __init__(self, name, initial_config=None, defaults=None):
+        """
+        :param initial_config: the initial configuration past on to
+            the constructor of the :class:`Configuration` sub-component
+        :param defaults: the defaults passed to
+            the constructor of the :class:`Configuration` sub-component
+        """
         super(Application, self).__init__()
         self._app_name = name
         self._app_dir = os.path.expanduser('~/.%s' % name)
@@ -79,9 +86,18 @@ class Application(BaseComponent):
 
     @property
     def app_dir(self):
+        """
+        Returns the application specific directory used to store the 
+        configuration. May be used by other application components 
+        as a place to store additional information.
+        """
         return getattr(self, "_config_dir", None)
 
     @property
     def config(self):
+        """
+        Returns the configuration sub-component created for this
+        application. 
+        """
         return getattr(self, "_config", None)
     

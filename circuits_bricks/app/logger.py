@@ -60,9 +60,12 @@ class LogSupport:
     If more immediate logging is needed, the :class:`logging.Logger` used by 
     the :class:`Logger` component is made available to components that inherit
     from :class:`LogSupport` as a property.
+    """
     
-    :ivar logger: the :class:`logging.Logger` injected into the component
-                  that inherits from :class:`LogSupport`
+    logger = logging.getLogger()
+    """
+    The :class:`logging.Logger` injected into every component
+    that inherits from :class:`LogSupport`.
     
     Note that the :attr:`logger` property is set by the :class:`Logger`
     component when a new component is registered. In order to benefit
@@ -72,7 +75,7 @@ class LogSupport:
     :class:`LogSupport` has been registered; it can therefore not be used
     e.g. in the constructor.
     """
-    logger = logging.getLogger()
+    
     _logger_channel_selection = "logger"
     
     def __init__(self, logger_channel = "logger"):
