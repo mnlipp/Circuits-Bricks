@@ -4,8 +4,8 @@
 .. _circuits framework: http://packages.python.org/circuits
 .. _circuits-bricks Page on PyPI: http://pypi.python.org/pypi/circuits-bricks
 .. _Package Documentation: http://packages.python.org/circuits-bricks
-.. _github: https://github.com/mnlipp/CircuitsBricks
-.. _issue tracker: https://github.com/mnlipp/CircuitsBricks/issues 
+.. _github: https://github.com/mnlipp/Circuits-Bricks
+.. _issue tracker: https://github.com/mnlipp/Circuits-Bricks/issues 
 
 Overview
 --------
