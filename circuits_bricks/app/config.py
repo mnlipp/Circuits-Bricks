@@ -9,7 +9,6 @@ from circuits.core.handlers import handler
 from circuits.core.components import BaseComponent
 from circuits.core.events import Event
 import os
-import sys
 
 try:
     from configparser import ConfigParser, SafeConfigParser
@@ -47,6 +46,11 @@ class EmitConfig(Event):
     values.
     """
     channels = ("configuration",)
+    """
+    The event is delivered on the ``configuration`` channel.
+    """
+    def __init__(self, *args, **kwargs):
+        super(Event, self).__init__(*args, **kwargs)
 
 
 class Configuration(BaseComponent):
