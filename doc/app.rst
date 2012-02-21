@@ -9,10 +9,18 @@ Application classes
 .. toctree::
    :maxdepth: 1
 
-Application
------------
+.. automodule:: circuits_bricks.app
 
-.. autoclass:: circuits_bricks.app.Application
+Logging
+-------
+
+.. autoclass:: circuits_bricks.app.Logger
+   :members:
+
+.. autoclass:: circuits_bricks.app.Log
+   :members:
+
+.. autoclass:: circuits_bricks.app.LogSupport
    :members:
 
 Configuration
@@ -27,15 +35,9 @@ Configuration
 .. autoclass:: circuits_bricks.app.EmitConfig
    :members:
 
-Logging
--------
+Application
+-----------
 
-.. autoclass:: circuits_bricks.app.Logger
-   :members:
-
-.. autoclass:: circuits_bricks.app.Log
-   :members:
-
-.. autoclass:: circuits_bricks.app.LogSupport
+.. autoclass:: circuits_bricks.app.Application
    :members:
 

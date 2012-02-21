@@ -20,9 +20,12 @@ except ImportError:
 class ConfigValue(Event):
     """
     This event informs about the change of a configuration value.
+    The events are sent to channel ``configuration``, so every
+    component interested in the events should have a handler that
+    listens on this channel.
     """
     
-    channel = "config_value"
+    channels = ("configuration",)
     
     def __init__(self, section, option, value):
         """
@@ -40,41 +43,47 @@ class ConfigValue(Event):
 
 class EmitConfig(Event):
     """
-    This event causes the :class:``Configuration`` to emit the configuration
+    This event causes the :class:`Configuration` to emit the configuration
     values.
     """
-    
-    channel = "emit_config"
+    channels = ("configuration",)
 
 
 class Configuration(BaseComponent):
     """
     This component provides a repository for configuration values.
     
-    Configuration values are propagated on the component's channel
-    (defaults to "configuration")
-    as :class:`util.config.ConfigValue` objects. Every 
-    received event is merged with the already existing configuration 
-    and saved in an ini-style configuration file.
-    
+    The component reads the initial configuration values from a
+    ini-style configuration file when created. During application bootstrap,
+    it intercepts the ``started`` event with a filter with  priority 999999.
+    After receiving the ``started`` event, it fires all known configuration 
+    values on the ``configuration`` channel as :class:`ConfigValue` events.
+    Then, it re-fires the intercepted started event.
+     
     Components that depend on configuration values define handlers
-    for ``ConfigValue`` objects as well 
-    and adapt themselves to the values propagated.
+    for ``config_value`` events on the ``configuration`` channel 
+    and adapt themselves to the values propagated. Note that 
+    due to the intercepted ``started`` event, the initial
+    configuration events are received before the ``startup`` event, so
+    components' configurations can be rearranged before they actually
+    start doing something.
+ 
+    Besides initially publishing the stored configuration values,
+    :class:`Configuration` listens for :class:`ConfigValue` events
+    fired by other components, merges them with the already existing 
+    configuration values and saves any changes to the configuration file.
+
+    Other components that are capable of adjusting themselves to changed
+    configuration values should, of course, continue to listen for
+    :class:`ConfigValue` events and adapt their behavior to the
+    changed configuration if possible.
     
-    During bootstrap, the configuration values have to be restored
-    from the values in the configuration file. This cannot be done
-    before all components have been created, but must be done before
-    the application is actually started. ``Configuration``
-    therefore defines a filter for the "started" event with priority 999.
-    When the filter is triggered, it postpones the "started" event
-    and emits all current configuration values before it.
-    
-    If your application requires a different behavior, you can also
-    fire a :class:`util.config.EmitValues` event or call
-    mathod ``emit_values``. This causes the 
-    :class:`util.config.Configuration` to emit the configuration values 
-    immediately. If this event is received before the "started" event, no
-    configurations values will be fired in response to the "started" event.    
+    If your application requires a different startup behavior, you 
+    can also fire an :class:`EmitValues` event or call
+    method :meth:`emit_values`. This causes the 
+    :class:`Configuration` to emit the configuration values 
+    immediately. If this event is received before the ``started`` event, 
+    the ``started`` event will not be intercepted.    
     """
     
     channel = "configuration"
@@ -94,9 +103,9 @@ class Configuration(BaseComponent):
                                to initialize the configuration if no existing
                                configuration file is found
         :type initial_config: dict of dicts
-        :param defaults: defaults passed to to the ConfigParser
-        :param channel: the channel to be used by this ``Configuration``
-                        (defaults to "config")
+        :param defaults: defaults passed to to the :class:`ConfigParser`
+        :param channel: the channel to be used by this :class:`Configuration`
+                        (defaults to "configuration")
         """
         super(Configuration, self).__init__(channel=channel)
         self._emit_done = False
@@ -119,6 +128,10 @@ class Configuration(BaseComponent):
                 self._config.write(f)
 
     def emit_values(self):
+        """
+        Fire all known configuration values as :class:`ConfigValue`
+        events.
+        """
         for section in self._config.sections():
             for option in self._config.options(section):
                 self.fire(ConfigValue
@@ -129,7 +142,7 @@ class Configuration(BaseComponent):
     def _on_emit_config(self):
         self.emit_values()
 
-    @handler("started", channel="*", filter=True, priority=sys.maxint)
+    @handler("started", channel="*", filter=True, priority=999999)
     def _on_started(self, event, component):
         if not self._emit_done:
             self.emit_values()

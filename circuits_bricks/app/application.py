@@ -74,7 +74,8 @@ class Application(BaseComponent):
             logfile = os.path.join(self._config_dir, logfile)
         self._log = Logger(logfile, name, logtype, loglevel,
                            handler_args=log_opts).register(self)
-        self.fire(Log(logging.INFO, 'Application ' + name + " started"))
+        self.fire(Log(logging.INFO, 'Application ' + name + " started"),
+                  "logger")
 
     @property
     def app_dir(self):

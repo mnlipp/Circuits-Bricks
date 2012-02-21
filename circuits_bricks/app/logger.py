@@ -20,8 +20,7 @@ class Log(Event):
     This class represents a log message that is to be written to the log.
     """
 
-    channel = "log"
-    target = "logger"
+    channels = ("logger",)
 
     def __init__(self, level, message):
         """
@@ -29,7 +28,7 @@ class Log(Event):
         the given level to the log.
         
         :param level: the level
-        :type level: a level as defined in module ``logging``
+        :type level: a level as defined in module :mod:`logging`
         
         :param message: the message to be written
         :type message: string
@@ -53,24 +52,24 @@ class Log(Event):
 
 class LogSupport:
     """
-    While using ``Log`` events fits nicely in the event based framework, it 
-    has the drawback of delaying log messages. As the log events are appended
-    at the end of the event queue, quite a lot of things may be executed
-    before the log event is eventually handled.
+    While using :class:`Log` events fits nicely in the event based framework, 
+    it has the drawback of delaying log messages. As the log events are 
+    appended at the end of the event queue, quite a lot of things may be 
+    executed before the log event is eventually handled.
 
-    If more immediate logging is needed, the ``logging.Logger`` used by 
-    the ``Logger`` component is made available to components that inherit
-    from ``LogSupport`` as a property.
+    If more immediate logging is needed, the :class:`logging.Logger` used by 
+    the :class:`Logger` component is made available to components that inherit
+    from :class:`LogSupport` as a property.
     
-    :ivar logger: the ``logging.Logger`` injected into the component
-                  that inherits from ``LogSupport``
+    :ivar logger: the :class:`logging.Logger` injected into the component
+                  that inherits from :class:`LogSupport`
     
-    Note that the ``logger`` property is set by the ``Logger``
+    Note that the :attr:`logger` property is set by the :class:`Logger`
     component when a new component is registered. In order to benefit
-    from ``LogSupport`` the ``Logger`` component must therefore have
-    been created and registered first. Also, the ``logger`` property
+    from :class:`LogSupport` the :class:`Logger` component must therefore have
+    been created and registered first. Also, the :attr:`logger` property
     is only available after the component that inherits from
-    ``LogSupport`` has been registered; it can therefore not be used
+    :class:`LogSupport` has been registered; it can therefore not be used
     e.g. in the constructor.
     """
     logger = logging.getLogger()
@@ -78,19 +77,19 @@ class LogSupport:
     
     def __init__(self, logger_channel = "logger"):
         """
-        ``LogSupport`` serves mainly as a marker interface. In environments
-        where multiple ``Logger`` components exist, however, the question
-        arises which ``Logger`` assigns its ``logging.Logger`` to the
+        :class:`LogSupport` serves mainly as a marker interface. In environments
+        where multiple :class:`Logger` components exist, however, the question
+        arises which :class:`Logger` assigns its :class:`logging.Logger` to the
         component. The constructor therefore supports the specification
-        of a selection property. A ``Logger`` component assigns its
-        ``logging.Logger`` only if that property matches its channel 
+        of a selection property. A :class:`Logger` component assigns its
+        :class:`logging.Logger` only if that property matches its channel 
         property.
         """
         self._logger_channel_selection = logger_channel
 
 class Logger(BaseComponent):
     """
-    The ``Logger`` component is a wrapper around a standard python
+    The :class:`Logger` component is a wrapper around a standard python
     logger that is allocated once and used throughout the whole
     application. This is different from the usual usage pattern 
     of the python logging package where a logger is allocated for 
@@ -122,7 +121,7 @@ class Logger(BaseComponent):
                     "TimedRotatingFile", "NTEventLog", "Syslog", "Stderr"
                     
         :param level: the debug level to log
-        :type level: integer, see predefined levels in module ``logging``
+        :type level: integer, see predefined levels in module :mod:`logging`
         
         :param format: the format for the log messages
         :type format: string
@@ -131,10 +130,10 @@ class Logger(BaseComponent):
                              constructor
         :type handler_args: dict
 
-        :param handler: a ``logging.Handler`` that is to
+        :param handler: a :class:`logging.Handler` that is to
             be used by the component instead of creating its own based
-            on ``type`` and ``handler_args``
-        :type handler: ``logging.Handler``
+            on *type* and *handler_args*
+        :type handler: :class:`logging.Handler`
         
         :param channel: the channel
         """
