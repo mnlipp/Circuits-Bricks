@@ -22,10 +22,14 @@ class ScopedChannel(object):
     server that received the request.
     
     Note that scoped channels only work in combination with
-    :class:`circuitsx.web.ScopeDispatcher`.
+    :class:`circuits_bricks.web.ScopeDispatcher`.
     """
     
     def __init__(self, scope="web", path="/"):
+        """
+        :param scope: The scope of the scoped channel
+        :param path: The path associated with the channel
+        """
         self._scope = scope
         self._path = path
     
@@ -55,8 +59,8 @@ class ScopeDispatcher(Dispatcher):
     a specific channel.
     
     The dispatcher forwards requests only to controllers with a 
-    :class:`circuitsx.web.ScopedChannel` as channel. The scoped
-    channel's scope property must match the channel assigned to the
+    :class:`circuits_bricks.web.ScopedChannel` as channel. The scoped
+    channel's :attr:`scope` property must match the channel assigned to the
     ``ScopeDispatcher``.
     
     In contrast to the standard :class:`circuits.web.Dispatcher`
@@ -113,3 +117,39 @@ class ScopeDispatcher(Dispatcher):
             channel = ScopedChannel(self.channel, channel)
         return name, channel, vpath
 
+
+class HostDispatcher(Dispatcher):
+    """
+    This component provides a dispatcher that dispatches only to
+    controllers with a :attr:`host` attribute equal to the 
+    dispatcher's channel.
+    
+    The host dispatcher does not override the behavior of a standard
+    dispatcher, it complements it. If a standard dispatcher component
+    is registered in your component hierarchy, it will still grab and
+    register the controller components.
+    """
+
+    channel = "web"
+
+    def __init__(self, **kwargs):
+        """
+        The constructor creates a new dispatcher using the given
+        parameters. The keyword parameter "channel" should be
+        provided.
+        """
+        super(HostDispatcher, self).__init__(**kwargs)
+
+    @handler("registered", channel="*", override=True)
+    def _on_registered(self, component, m):
+        if (isinstance(component, BaseController) \
+                and getattr(component, "host", False) == self.channel \
+                and component.channel not in self.paths):
+            self.paths[component.channel] = component
+
+    @handler("unregistered", channel="*", override=True)
+    def _on_unregistered(self, component, m):
+        if (isinstance(component, BaseController) \
+                and getattr(component, "host", False) == self.channel \
+                and component.channel in self.paths):
+            del self.paths[component.channel]
