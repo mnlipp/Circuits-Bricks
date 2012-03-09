@@ -47,4 +47,13 @@ controller.
 .. autoclass:: circuits_bricks.web.HostDispatcher
    :members:
 
+Filters
+-------
+
+.. autoclass:: circuits_bricks.web.LanguagePreferences
+   :members:
+
+.. autoclass:: circuits_bricks.web.ThemeSelection
+   :members:
+
    

@@ -8,3 +8,5 @@
 
 from .dispatchers.dispatcher import ScopedChannel, ScopeDispatcher, \
     HostDispatcher
+
+from .filters import LanguagePreferences, ThemeSelection
