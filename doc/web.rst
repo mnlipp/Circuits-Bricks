@@ -17,8 +17,8 @@ in a single component hierarchy. The circuits' :class:`VirtualHosts` component
 works around this by prefixing every request with an additional path component,
 thus associating each host with its own subtree.
 
-In some circumstances this approach is inadequate. The following two
-dispatchers provide alternatives that dispatch requests received on their 
+In some circumstances this approach is inadequate. The following 
+dispatcher provides an alternative that dispatch requests received on their 
 channel only to a subset of the controllers in the component hierarchy.
 
 ScopeDispatcher
@@ -35,17 +35,6 @@ need not be derived from :class:`BaseComponent`.
 .. autoclass:: circuits_bricks.web.ScopedChannel
    :members:
 
-
-HostDispatcher
-^^^^^^^^^^^^^^
-
-The :class:`HostDispatcher` provides a different approach for establishing
-more than one web document tree. A :class:`HostDispatcher` filters
-the controllers that it dispatches to using an additional attribute of the
-controller. 
-
-.. autoclass:: circuits_bricks.web.HostDispatcher
-   :members:
 
 Filters
 -------

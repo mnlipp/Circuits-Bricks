@@ -6,7 +6,6 @@
 .. moduleauthor:: mnl
 """
 
-from .dispatchers.dispatcher import ScopedChannel, ScopeDispatcher, \
-    HostDispatcher
+from .dispatchers.dispatcher import ScopedChannel, ScopeDispatcher
 
 from .filters import LanguagePreferences, ThemeSelection
