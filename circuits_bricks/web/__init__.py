@@ -7,5 +7,6 @@
 """
 
 from .dispatchers.dispatcher import ScopedChannel, ScopeDispatcher
+from .client import Client
 
 from .filters import LanguagePreferences, ThemeSelection
