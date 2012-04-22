@@ -5,6 +5,8 @@
 
 .. moduleauthor:: mnl
 """
+from circuits.core.utils import findcmp
+from circuits.core.pollers import BasePoller, Poller
 
 try:
     from urllib.parse import urlparse
@@ -13,7 +15,7 @@ except ImportError:
 
 from circuits.web.headers import Headers
 from circuits.core import handler, BaseComponent
-from circuits.net.sockets import TCPClient, Write, Close
+from circuits.net.sockets import TCPClient, Write, Close, Connect
 
 from circuits.net.protocols.http import HTTP
 from circuits.web.client import parse_url, NotConnected
@@ -33,15 +35,15 @@ class Client(BaseComponent):
         self._host, self._port, self._resource, self._secure = parse_url(url)
 
         self._response = None
-
-        self._transport = TCPClient(channel=channel).register(self)
-
-        HTTP(channel=channel).register(self._transport)
+        self._transport = None
 
     @handler("request")
     def request(self, method, url, body=None, headers={}):
-        if not self._transport.connected:
-            self._transport.connect(self._host, self._port, self._secure)
+        if self._transport == None or not self._transport.connected:
+            self._transport = TCPClient(channel=self.channel).register(self)
+            HTTP(channel=self.channel).register(self._transport)
+            self.fire(Connect(self._host, self._port, self._secure),
+                      self._transport)
         p = urlparse(url)
         if p.hostname and p.hostname != self._host \
             or p.scheme == "http" and self._secure \
@@ -69,6 +71,10 @@ class Client(BaseComponent):
         self._response = response
         if response.headers.get("Connection") == "Close":
             self.fire(Close(), self._transport)
+
+    def close(self):
+        if self._transport != None:
+            self._transport.close()
 
     @property
     def connected(self):
