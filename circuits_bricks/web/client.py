@@ -5,13 +5,14 @@
 
 .. moduleauthor:: mnl
 """
-from circuits.core.utils import findcmp
-from circuits.core.pollers import BasePoller, Poller
-
 try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
+
+from socket import error as SocketError
+from errno import ECONNRESET
+
 
 from circuits.web.headers import Headers
 from circuits.core import handler, BaseComponent
@@ -36,6 +37,7 @@ class Client(BaseComponent):
 
         self._response = None
         self._transport = None
+        self._pending = 0
 
     @handler("request")
     def request(self, method, url, body=None, headers={}):
@@ -62,6 +64,7 @@ class Client(BaseComponent):
                 + (":" + str(self._port)) if self._port else ""
         command = "%s %s HTTP/1.1" % (method, resource)
         message = "%s\r\n%s" % (command, headers)
+        self._pending += 1
         self.fire(Write(message.encode('utf-8')), self._transport)
         if body:
             self.fire(Write(body), self._transport)
@@ -69,8 +72,17 @@ class Client(BaseComponent):
     @handler("response")
     def _on_response(self, response):
         self._response = response
+        self._pending -= 1
         if response.headers.get("Connection") == "Close":
             self.fire(Close(), self._transport)
+
+    @handler("error", filter=True, priority=10)
+    def _on_error(self, error):
+        # For HTTP 1.1 we leave the connection open. If the peer closes
+        # it after some time and we have no pending request, that's OK.
+        if isinstance(error, SocketError) and error.args[0] == ECONNRESET \
+            and self._pending == 0:
+            return True
 
     def close(self):
         if self._transport != None:
