@@ -22,7 +22,7 @@ class Log(Event):
 
     channels = ("logger",)
 
-    def __init__(self, level, message):
+    def __init__(self, level, message, **kwargs):
         """
         The constructor creates a new event that writes the message with
         the given level to the log.
@@ -33,7 +33,7 @@ class Log(Event):
         :param message: the message to be written
         :type message: string
         """
-        super(Log, self).__init__(level, message)
+        super(Log, self).__init__(level, message, **kwargs)
         # Find the stack frame of the caller so that we can note the source
         # file name, line number and function name.
         self.file_name, self.line_number, self.func \
@@ -219,7 +219,7 @@ class Logger(BaseComponent):
             return
         record = self._logger.makeRecord \
             (self.name, level, event.file_name, event.line_number,
-             msg, args, None, event.func)
+             msg, args, None, event.func, kwargs)
         self._logger.handle(record)
 
     @handler("registered", channel="*")
