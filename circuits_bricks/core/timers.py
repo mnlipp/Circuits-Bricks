@@ -93,6 +93,7 @@ class Timer(BaseComponent):
         else:
             if self._schedule is not None:
                 self._schedule.remove_timer(self)
+                self._schedule = None
             self.unregister()
 
     def reset(self):
