@@ -24,5 +24,12 @@ setup(
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
     ],
-    packages=['circuits_bricks', 'tests'],
+    packages=['circuits_bricks', 
+              'circuits_bricks.app', 
+              'circuits_bricks.core',
+              'circuits_bricks.misc', 
+              'circuits_bricks.net', 
+              'circuits_bricks.web', 
+              'circuits_bricks.web.dispatchers', 
+              'tests'],
 )
