@@ -19,12 +19,10 @@ setup(
     license = "MIT",
     keywords = "circuits component",
     url = "http://packages.python.org/circuits-bricks",
-    packages=['circuits_bricks', 'tests'],
-    package_data={'circuits_bricks': ['*.properties'],
-                  'tests': ['*.properties']},
     long_description=read('pypi-overview.rst'),
     classifiers=[
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
     ],
+    packages=['circuits_bricks', 'tests'],
 )
