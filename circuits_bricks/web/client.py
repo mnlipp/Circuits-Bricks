@@ -90,8 +90,8 @@ class Client(BaseComponent):
 
     @property
     def connected(self):
-        if hasattr(self, "_transport"):
-            return self._transport.connected
+        return getattr(self._transport, "connected", False) \
+            if hasattr(self, "_transport") else False
 
     @property
     def response(self):

@@ -6,4 +6,4 @@
 .. moduleauthor:: mnl
 """
 
-__version__ = "0.1.2p2"
+__version__ = "0.2"

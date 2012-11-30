@@ -5,7 +5,6 @@ import unittest
 from circuits_bricks.app.application import Application
 from circuits.core.components import BaseComponent
 from circuits.core.handlers import handler
-from circuits.core.debugger import Debugger
 from tests.helpers import wait_for
 
 class ConfiguredComponent(BaseComponent):
@@ -24,7 +23,6 @@ class Test(unittest.TestCase):
         self._application = Application("BasicConfigTest")
         self._application.config._on_config_value\
             ("configured-component", "value", "Yes")
-        Debugger().register(self._application)
         self._conf_comp = ConfiguredComponent().register(self._application)
         self._application.start()
 

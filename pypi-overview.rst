@@ -21,7 +21,7 @@ Requirements
 ------------
 
 circuits-bricks has no dependencies beyond the `Python Standard Library`_
-and the `circuits framework`_ in the upcoming 1.7 version.
+and the `circuits framework`_ in the 2.0.1 version.
 
 Installation
 ------------
