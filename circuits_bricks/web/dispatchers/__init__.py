@@ -5,3 +5,4 @@
 
 .. moduleauthor:: mnl
 """
+from circuits_bricks.web.dispatchers.websockets import WebSockets
