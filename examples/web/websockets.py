@@ -4,6 +4,7 @@ from circuits import Component
 from circuits_bricks.web.dispatchers import WebSockets
 from circuits.web import Server, Controller, Logger
 from circuits.net.sockets import Write
+from circuits.core.debugger import Debugger
 
 
 class Echo(Component):
@@ -24,4 +25,5 @@ class Root(Controller):
         + Root()
         + Logger()
         + WebSockets("/websocket")
+        + Debugger()
 ).run()
