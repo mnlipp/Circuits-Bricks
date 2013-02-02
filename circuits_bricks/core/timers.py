@@ -51,12 +51,27 @@ class TimerSchedule(BaseComponent):
 
 class Timer(BaseComponent):
     """
-    ...
+    A timer is a component that fires an event once after a certain
+    delay or periodically at a regular interval.
     """
 
     _schedule = None
 
     def __init__(self, interval, event, *channels, **kwargs):
+        """
+        :param interval: the delay or interval to wait for until
+            the event is fired. If interval is specified as
+            datetime, the interval is recalculated as the time span from
+            now to the given datetime.
+        :type interval: datetime or float number
+
+        :param event: the event to fire.
+        :type event: :class:`~.events.Event`
+
+        If the optional keyword argument *persist* is set to ``True``,
+        the event will be fired repeatedly. Else the timer fires the
+        event once and then unregisters itself.
+        """
         super(Timer, self).__init__()
 
         if isinstance(interval, datetime):
@@ -85,21 +100,24 @@ class Timer(BaseComponent):
             if self._schedule is not None:
                 self._schedule.add_timer(self)
 
+    def unregister(self):
+        if self._schedule is not None:
+            self._schedule.remove_timer(self)
+            self._schedule = None
+        super(Timer, self).unregister()
+
     def trigger(self):
         self.fire(self.event, *self.channels)
 
         if self.persist:
             self.reset()
         else:
-            if self._schedule is not None:
-                self._schedule.remove_timer(self)
-                self._schedule = None
             self.unregister()
 
     def reset(self):
-        """T.reset() -> None
-
-        Reset the timer.
+        """
+        Reset the timer, i.e. clear the amount of time already waited
+        for.
         """
         if self._schedule is not None:
             self._schedule.remove_timer(self)
