@@ -6,12 +6,13 @@
 .. moduleauthor:: mnl
 """
 from circuits_bricks.core.timers import Timer
+from circuits.core.events import Event
 try:
     from urllib.parse import urlparse
 except ImportError:
     from urlparse import urlparse
 
-from errno import ECONNRESET, ETIMEDOUT
+from errno import ETIMEDOUT
 from collections import deque
 
 
@@ -22,6 +23,23 @@ from circuits.net.sockets import TCPClient, Write, Close, Connect, SocketError
 from circuits.net.protocols.http import HTTP
 from circuits.web.client import parse_url, NotConnected
 
+
+class Request(Event):
+    """Request Event
+
+    This Event is used to initiate a new request.
+
+    :param method: HTTP Method (PUT, GET, POST, DELETE)
+    :type  method: str
+
+    :param path: Path to resource
+    :type  path: str
+    """
+
+    def __init__(self, method, path, body=None, headers={}, timeout=None):
+        "x.__init__(...) initializes x; see x.__class__.__doc__ for signature"
+
+        super(Request, self).__init__(method, path, body, headers, timeout)
 
 class Client(BaseComponent):
     """
@@ -44,8 +62,8 @@ class Client(BaseComponent):
         self._timer = None
 
     @handler("request")
-    def request(self, event, method, url, body=None, headers={}):
-        timeout = getattr(event, "timeout", None) or self._timeout
+    def request(self, event, method, url, body=None, headers={}, timeout=None):
+        timeout = timeout or self._timeout
         if self._transport == None or not self._transport.connected:
             self._transport = TCPClient(channel=self.channel).register(self)
             HTTP(channel=self.channel).register(self._transport)
@@ -106,15 +124,6 @@ class Client(BaseComponent):
         self._clear_timer()
         if response.headers.get("Connection") == "Close":
             self.fire(Close(), self._transport)
-
-    @handler("error", filter=True, priority=10)
-    def _on_error(self, error):
-        # For HTTP 1.1 we leave the connection open. If the peer closes
-        # it after some time and we have no pending request, that's OK.
-        if isinstance(error, SocketError) and error.args[0] == ECONNRESET \
-            and self._outstanding == 0:
-            return True
-        self._clear_timer()
 
     @handler("close")
     def close(self):
