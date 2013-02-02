@@ -11,14 +11,13 @@ try:
 except ImportError:
     from urlparse import urlparse
 
-from socket import error as SocketError
 from errno import ECONNRESET, ETIMEDOUT
 from collections import deque
 
 
 from circuits.web.headers import Headers
 from circuits.core import handler, BaseComponent
-from circuits.net.sockets import TCPClient, Write, Close, Connect, Error
+from circuits.net.sockets import TCPClient, Write, Close, Connect, SocketError
 
 from circuits.net.protocols.http import HTTP
 from circuits.web.client import parse_url, NotConnected
@@ -89,7 +88,7 @@ class Client(BaseComponent):
         message = "%s\r\n%s" % (command, headers)
         self._outstanding += 1
         if timeout is not None:
-            self._timer = Timer(timeout, Error(ETIMEDOUT), self.channel) \
+            self._timer = Timer(timeout, SocketError(ETIMEDOUT), self.channel) \
                 .register(self)
         self.fire(Write(message.encode('utf-8')), self._transport)
         if body:
