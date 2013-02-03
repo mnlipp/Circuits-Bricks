@@ -17,6 +17,7 @@ from circuits.core.utils import findcmp
 from time import time, mktime
 from datetime import datetime
 from circuits.core.components import BaseComponent
+from threading import RLock
 
 class TimerSchedule(BaseComponent):
     
@@ -97,7 +98,7 @@ class Timer(BaseComponent):
                 if component is not None:
                     self._schedule = component
                 else:
-                    self._schedule = TimerSchedule().register(self)
+                    self._schedule = TimerSchedule().register(manager.root)
             if self._schedule is not None:
                 self._schedule.add_timer(self)
 
