@@ -56,8 +56,6 @@ class Timer(BaseComponent):
     delay or periodically at a regular interval.
     """
 
-    _schedule = None
-
     def __init__(self, interval, event, *channels, **kwargs):
         """
         :param interval: the delay or interval to wait for until
@@ -74,6 +72,7 @@ class Timer(BaseComponent):
         event once and then unregisters itself.
         """
         super(Timer, self).__init__()
+        self._schedule = None
         self._lock = RLock()
 
         if isinstance(interval, datetime):
