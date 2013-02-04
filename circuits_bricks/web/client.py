@@ -103,13 +103,15 @@ class Client(BaseComponent):
             headers["Host"] = self._host \
                 + (":" + str(self._port)) if self._port else ""
         command = "%s %s HTTP/1.1" % (method, resource)
+        if body is not None:
+            headers["Content-Length"] = len(body)
         message = "%s\r\n%s" % (command, headers)
         self._outstanding += 1
         if timeout is not None:
             self._timer = Timer(timeout, SocketError(ETIMEDOUT), self.channel) \
                 .register(self)
         self.fire(Write(message.encode('utf-8')), self._transport)
-        if body:
+        if body is not None:
             self.fire(Write(body), self._transport)
 
     def _clear_timer(self):
