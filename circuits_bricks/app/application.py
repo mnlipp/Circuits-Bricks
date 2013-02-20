@@ -38,7 +38,7 @@ class Application(BaseComponent):
     channel="application"
     """The component's channel (defaults to ``application``)."""
     
-    def __init__(self, name, initial_config=None, defaults=None):
+    def __init__(self, name, initial_config=None, defaults={}):
         """
         :param initial_config: the initial configuration past on to
             the constructor of the :class:`Configuration` sub-component
@@ -47,22 +47,17 @@ class Application(BaseComponent):
         """
         super(Application, self).__init__()
         self._app_name = name
-        self._app_dir = os.path.expanduser('~/.%s' % name)
-        self._config_dir = self._app_dir
-        self._log_dir = self._app_dir
         
-        if not defaults:
-            defaults = dict()
-        if not defaults.has_key('app_dir'):
-            defaults['app_dir'] = self._app_dir
-        if not defaults.has_key('config_dir'):
-            defaults['config_dir'] = self._config_dir
-        if not defaults.has_key('log_dir'):
-            defaults['log_dir'] = self._log_dir
+        self._app_dir = defaults.setdefault \
+            ('app_dir', os.path.expanduser('~/.%s' % name))
+        self._config_dir = defaults.setdefault ('config_dir', self._app_dir)
+        self._log_dir = defaults.setdefault('log_dir', self._app_dir)
 
         if not initial_config:
             initial_config = DEFAULT_CONFIG
 
+        if not os.path.exists(self._app_dir):
+            os.makedirs(self._app_dir)
         if not os.path.exists(self._config_dir):
             os.makedirs(self._config_dir)
         self._config = Configuration \
@@ -91,7 +86,7 @@ class Application(BaseComponent):
         configuration. May be used by other application components 
         as a place to store additional information.
         """
-        return getattr(self, "_config_dir", None)
+        return getattr(self, "_app_dir", None)
 
     @property
     def config(self):
