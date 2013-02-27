@@ -3,7 +3,7 @@
 	<name>CircuitsBricks</name>
 	<comment></comment>
 	<projects>
-		<project>circuits-dev</project>
+		<project>circuits</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
