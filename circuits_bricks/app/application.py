@@ -8,7 +8,7 @@
 from circuits.core.components import BaseComponent
 import os
 import logging
-from circuits_bricks.app.logger import Logger, Log
+from circuits_bricks.app.logger import Logger, log
 from circuits_bricks.app.config import Configuration
 
 DEFAULT_CONFIG = {
@@ -76,7 +76,7 @@ class Application(BaseComponent):
             logfile = os.path.join(self._config_dir, logfile)
         self._log = Logger(logfile, name, logtype, loglevel,
                            handler_args=log_opts).register(self)
-        self.fire(Log(logging.INFO, 'Application ' + name + " started"),
+        self.fire(log(logging.INFO, 'Application ' + name + " started"),
                   "logger")
 
     @property

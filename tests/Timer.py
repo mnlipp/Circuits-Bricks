@@ -8,7 +8,7 @@ from circuits.core.components import Component
 from circuits_bricks.core.timers import Timer
 from tests.helpers import wait_for
 
-class Test(Event):
+class test(Event):
     """Test Event"""
 
 class App(Component):
@@ -32,13 +32,13 @@ class TimerTest(unittest.TestCase):
         self.app.stop()
 
     def test_basic(self):
-        timer = Timer(0.1, Test(), "timer")
+        timer = Timer(0.1, test(), "timer")
         timer.register(self.app)
         wait_for(self.app, "flag")
         self.app.reset()
 
     def test_persistent(self):
-        timer = Timer(0.1, Test(), "timer", persist=True)
+        timer = Timer(0.1, test(), "timer", persist=True)
         timer.register(self.app)
 
         for _ in range(2):
@@ -50,7 +50,7 @@ class TimerTest(unittest.TestCase):
     def test_datetime(self):
         now = datetime.now()
         d = now + timedelta(seconds=0.1)
-        timer = Timer(d, Test(), "timer")
+        timer = Timer(d, test(), "timer")
         timer.register(self.app)
         wait_for(self.app, "flag")
         self.app.reset()

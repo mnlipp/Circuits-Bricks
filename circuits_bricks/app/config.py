@@ -16,7 +16,7 @@ except ImportError:
     from ConfigParser import ConfigParser, SafeConfigParser
 
 
-class ConfigValue(Event):
+class config_value(Event):
     """
     This event informs about the change of a configuration value.
     The events are sent to channel ``configuration``, so every
@@ -38,9 +38,9 @@ class ConfigValue(Event):
         :param value: the new value
         :type value: string 
         """
-        super(ConfigValue, self).__init__(section, option, value)
+        super(config_value, self).__init__(section, option, value)
 
-class EmitConfig(Event):
+class emit_config(Event):
     """
     This event causes the :class:`Configuration` to emit the configuration
     values.
@@ -61,7 +61,7 @@ class Configuration(BaseComponent):
     ini-style configuration file when created. During application bootstrap,
     it intercepts the ``started`` event with a filter with  priority 999999.
     After receiving the ``started`` event, it fires all known configuration 
-    values on the ``configuration`` channel as :class:`ConfigValue` events.
+    values on the ``configuration`` channel as :class:`config_value` events.
     Then, it re-fires the intercepted started event.
      
     Components that depend on configuration values define handlers
@@ -73,17 +73,17 @@ class Configuration(BaseComponent):
     start doing something.
  
     Besides initially publishing the stored configuration values,
-    :class:`Configuration` listens for :class:`ConfigValue` events
+    :class:`Configuration` listens for :class:`config_value` events
     fired by other components, merges them with the already existing 
     configuration values and saves any changes to the configuration file.
 
     Other components that are capable of adjusting themselves to changed
     configuration values should, of course, continue to listen for
-    :class:`ConfigValue` events and adapt their behavior to the
+    :class:`config_value` events and adapt their behavior to the
     changed configuration if possible.
     
     If your application requires a different startup behavior, you 
-    can also fire an :class:`EmitValues` event or call
+    can also fire an :class:`emit_config` event or call
     method :meth:`emit_values`. This causes the 
     :class:`Configuration` to emit the configuration values 
     immediately. If this event is received before the ``started`` event, 
@@ -133,12 +133,12 @@ class Configuration(BaseComponent):
 
     def emit_values(self):
         """
-        Fire all known configuration values as :class:`ConfigValue`
+        Fire all known configuration values as :class:`config_value`
         events.
         """
         for section in self._config.sections():
             for option in self._config.options(section):
-                self.fire(ConfigValue
+                self.fire(config_value
                           (section, option, self._config.get(section, option)))
         self._emit_done = True
 

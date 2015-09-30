@@ -15,7 +15,7 @@ from logging import FileHandler, StreamHandler
 from logging.handlers import WatchedFileHandler, RotatingFileHandler,\
     TimedRotatingFileHandler, NTEventLogHandler, SysLogHandler
 
-class Log(Event):
+class log(Event):
     """
     This class represents a log message that is to be written to the log.
     """
@@ -33,7 +33,7 @@ class Log(Event):
         :param message: the message to be written
         :type message: string
         """
-        super(Log, self).__init__(level, message, **kwargs)
+        super(log, self).__init__(level, message, **kwargs)
         # Find the stack frame of the caller so that we can note the source
         # file name, line number and function name.
         self.file_name, self.line_number, self.func \
@@ -52,7 +52,7 @@ class Log(Event):
 
 class LogSupport:
     """
-    While using :class:`Log` events fits nicely in the event based framework, 
+    While using :class:`log` events fits nicely in the event based framework, 
     it has the drawback of delaying log messages. As the log events are 
     appended at the end of the event queue, quite a lot of things may be 
     executed before the log event is eventually handled.
@@ -98,7 +98,7 @@ class Logger(BaseComponent):
     of the python logging package where a logger is allocated for 
     each module.
     
-    In order to write a message to the log, a :class:`util.logger.Log` 
+    In order to write a message to the log, a :class:`util.logger.log` 
     event must be fired.
     """
 

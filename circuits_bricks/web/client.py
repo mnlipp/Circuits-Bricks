@@ -18,13 +18,13 @@ from collections import deque
 
 from circuits.web.headers import Headers
 from circuits.core import handler, BaseComponent
-from circuits.net.sockets import TCPClient, Write, Close, Connect, SocketError
+from circuits.net.sockets import TCPClient, write, close, connect, SocketError
 
-from circuits.net.protocols.http import HTTP
+from circuits.protocols.http import HTTP
 from circuits.web.client import parse_url, NotConnected
 
 
-class Request(Event):
+class request(Event):
     """Request Event
 
     This Event is used to initiate a new request.
@@ -39,7 +39,7 @@ class Request(Event):
     def __init__(self, method, path, body=None, headers={}, timeout=None):
         "x.__init__(...) initializes x; see x.__class__.__doc__ for signature"
 
-        super(Request, self).__init__(method, path, body, headers, timeout)
+        super(request, self).__init__(method, path, body, headers, timeout)
 
 class Client(BaseComponent):
     """
@@ -67,7 +67,7 @@ class Client(BaseComponent):
         if self._transport == None or not self._transport.connected:
             self._transport = TCPClient(channel=self.channel).register(self)
             HTTP(channel=self.channel).register(self._transport)
-            self.fire(Connect(self._host, self._port, self._secure),
+            self.fire(connect(self._host, self._port, self._secure),
                       self._transport)
             self._pending.append((method, url, body, headers, timeout))
         else:
@@ -82,7 +82,7 @@ class Client(BaseComponent):
     @handler("disconnected")
     def _on_disconnected(self):
         if len(self._pending) > 0:
-            self.fire(Connect(self._host, self._port, self._secure),
+            self.fire(connect(self._host, self._port, self._secure),
                       self._transport)
 
     def _send_request(self, method, url, body=None, headers={}, timeout=None):
@@ -110,9 +110,9 @@ class Client(BaseComponent):
         if timeout is not None:
             self._timer = Timer(timeout, SocketError(ETIMEDOUT), self.channel) \
                 .register(self)
-        self.fire(Write(message.encode('utf-8')), self._transport)
+        self.fire(write(message.encode('utf-8')), self._transport)
         if body is not None:
-            self.fire(Write(body), self._transport)
+            self.fire(write(body), self._transport)
 
     def _clear_timer(self):
         if self._timer is not None:
@@ -125,13 +125,13 @@ class Client(BaseComponent):
         self._outstanding -= 1
         self._clear_timer()
         if response.headers.get("Connection") == "Close":
-            self.fire(Close(), self._transport)
+            self.fire(close(), self._transport)
 
     @handler("close")
     def close(self):
         self._clear_timer()
         if self._transport.connected:
-            self.fire(Close(), self._transport)
+            self.fire(close(), self._transport)
 
     @property
     def connected(self):

@@ -8,12 +8,12 @@
 from circuits.core.events import Event
 from circuits.core.handlers import handler
 
-class ComponentQuery(Event):
+class component_query(Event):
     
     channels = ("component_query")
     
     def __init__(self, query_function, **kwargs):
-        super(ComponentQuery, self).__init__()
+        super(component_query, self).__init__()
         self._query_function = query_function
 
     def decide(self, component):

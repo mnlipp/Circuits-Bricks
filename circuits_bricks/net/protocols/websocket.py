@@ -3,7 +3,7 @@
 """
 from circuits.core.components import BaseComponent
 from circuits.core.handlers import handler
-from circuits.net.sockets import Write, Read, Close
+from circuits.net.sockets import write, read, close
 import os
 import random
 
@@ -59,9 +59,9 @@ class WebSocketCodec(BaseComponent):
                 messages = self._parse_messages()
                 for message in messages:
                     if self._sock is not None:
-                        self.fire(Read(self._sock, message))
+                        self.fire(read(self._sock, message))
                     else:
-                        self.fire(Read(message))
+                        self.fire(read(message))
                 return True
             self.addHandler(_on_read_raw)
             @handler("disconnect", channel=parent.channel)
@@ -121,9 +121,9 @@ class WebSocketCodec(BaseComponent):
                 elif opcode == 8:
                     self._close_received = True
                     if self._sock:
-                        self.fire(Close(self._sock))
+                        self.fire(close(self._sock))
                     else:
-                        self.fire(Close())
+                        self.fire(close())
                     break
                 # check for Ping
                 elif opcode == 9:
@@ -189,9 +189,9 @@ class WebSocketCodec(BaseComponent):
 
     def _write(self, data):
         if self._sock is not None:
-            self.fire(Write(self._sock, data), self.parent.channel)
+            self.fire(write(self._sock, data), self.parent.channel)
         else:
-            self.fire(Write(data), self.parent.channel)
+            self.fire(write(data), self.parent.channel)
 
     @handler("close")
     def _on_close(self, *args):
@@ -200,6 +200,6 @@ class WebSocketCodec(BaseComponent):
             self._close_sent = True
         if self._close_received and self._close_sent:
             if self._sock:
-                self.fire(Close(self._sock), self.parent.channel)
+                self.fire(close(self._sock), self.parent.channel)
             else:
-                self.fire(Close(), self.parent.channel)
+                self.fire(close(), self.parent.channel)

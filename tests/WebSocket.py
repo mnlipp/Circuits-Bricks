@@ -3,7 +3,7 @@
 """
 import unittest
 from circuits.core.components import Component
-from circuits.net.sockets import Write
+from circuits.net.sockets import write
 from circuits.web.controllers import Controller
 from circuits.web.servers import Server
 from circuits_bricks.web.dispatchers.websockets import WebSockets
@@ -11,14 +11,14 @@ from circuits.core.manager import Manager
 from circuits_bricks.web.websocket import WebSocketClient
 import time
 from circuits.core.debugger import Debugger
-from circuits.web.client import Connect
+from circuits.web.client import connect
 
 class Echo(Component):
 
     channel = "ws"
 
     def read(self, sock, data):
-        self.fireEvent(Write(sock, "Received: " + data))
+        self.fireEvent(write(sock, "Received: " + data))
 
 class Root(Controller):
 
@@ -51,8 +51,8 @@ class Test(unittest.TestCase):
         app = WebSocketClient("ws://localhost:8123/websocket")
         wsclient = WSClient().register(app)
         app.start()
-        app.fire(Connect())
-        app.fire(Write("Hello!"), "ws")
+        app.fire(connect())
+        app.fire(write("Hello!"), "ws")
         for i in range(100):
             if wsclient.response is not None:
                 break

@@ -3,7 +3,7 @@
 """
 import unittest
 from errno import ETIMEDOUT
-from circuits_bricks.web.client import Client, Request
+from circuits_bricks.web.client import Client, request
 from circuits.core.manager import Manager
 from circuits.web.servers import BaseServer
 from circuits.web.controllers import BaseController, expose
@@ -45,7 +45,7 @@ class Test(unittest.TestCase):
         app = Client("http://localhost:%d/hallo" % self.server.port,
                      channel="TestClient")
         app.start()
-        app.fire(Request("GET", "http://localhost:%d/test" % self.server.port))
+        app.fire(request("GET", "http://localhost:%d/test" % self.server.port))
         for i in range(100):
             if app.response:
                 break
@@ -63,7 +63,7 @@ class Test(unittest.TestCase):
         app = Client("http://localhost:%d/test" % self.server.port,
                      channel="TestClient")
         app.start()
-        app.fire(Request("GET", "test"))
+        app.fire(request("GET", "test"))
         for i in range(10000):
             if app.response:
                 break
@@ -86,7 +86,7 @@ class Test(unittest.TestCase):
             self.error = e
         app.addHandler(_on_error)
         app.start()
-        app.fire(Request("GET", "test_timeout", timeout=0.5))
+        app.fire(request("GET", "test_timeout", timeout=0.5))
         for i in range(10000):
             if app.response or self.error:
                 break

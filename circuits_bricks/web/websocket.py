@@ -14,8 +14,8 @@ except ImportError:
     from urlparse import urlparse
 from circuits.core.components import BaseComponent
 from circuits.web.client import NotConnected
-from circuits.net.sockets import TCPClient, Connect, Write, Close
-from circuits.net.protocols.http import HTTP
+from circuits.net.sockets import TCPClient, connect, write, close
+from circuits.protocols.http import HTTP
 from socket import error as SocketError
 from errno import ECONNRESET
 
@@ -64,7 +64,7 @@ class WebSocketClient(BaseComponent):
         
     @handler("connect", priority=0.1, filter=True)
     def _on_connect(self, event, *args, **kwargs):
-        if not isinstance(event, client.Connect):
+        if not isinstance(event, client.connect):
             return
         p = urlparse(self._url)
         if not p.hostname:
@@ -82,7 +82,7 @@ class WebSocketClient(BaseComponent):
         self._resource = p.path or "/"
         if p.query:
             self._resource += "?" + p.query
-        self.fire(Connect(self._host, self._port, self._secure),
+        self.fire(connect(self._host, self._port, self._secure),
                   self._transport)
 
     @handler("connected")
@@ -103,7 +103,7 @@ class WebSocketClient(BaseComponent):
         command = "GET %s HTTP/1.1" % self._resource
         message = "%s\r\n%s" % (command, headers)
         self._pending += 1
-        self.fire(Write(message.encode('utf-8')), self._transport)
+        self.fire(write(message.encode('utf-8')), self._transport)
         return True
 
     @handler("response")
@@ -112,7 +112,7 @@ class WebSocketClient(BaseComponent):
         self._pending -= 1
         if response.headers.get("Connection") == "Close" \
             or response.status != 101:
-            self.fire(Close(), self._transport)
+            self.fire(close(), self._transport)
             self.fire(NotConnected())
         WebSocketCodec(channel=self._wschannel).register(self)
 

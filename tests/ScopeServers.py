@@ -48,10 +48,10 @@ class TestScopedServers(TestCase):
         self.manager.stop()
 
     def test_access(self):
-        f = urlopen(self.server1.base)
+        f = urlopen(self.server1.http.base)
         s = f.read()
         self.assertEqual(s, b"Hello from site 1!")
 
-        f = urlopen(self.server2.base)
+        f = urlopen(self.server2.http.base)
         s = f.read()
         self.assertEqual(s, b"Hello from site 2!")

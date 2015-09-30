@@ -3,7 +3,7 @@
 from circuits import Component
 from circuits_bricks.web.dispatchers import WebSockets
 from circuits.web import Server, Controller, Logger
-from circuits.net.sockets import Write
+from circuits.net.sockets import write
 from circuits.core.debugger import Debugger
 
 
@@ -12,7 +12,7 @@ class Echo(Component):
     channel = "ws"
 
     def read(self, sock, data):
-        self.fireEvent(Write(sock, "Received: " + data))
+        self.fireEvent(write(sock, "Received: " + data))
 
 
 class Root(Controller):
