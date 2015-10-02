@@ -7,7 +7,6 @@
 """
 from circuits.core.components import BaseComponent
 from circuits.core.handlers import handler
-import threading
 
 class LanguagePreferences(BaseComponent):
     """
@@ -19,22 +18,6 @@ class LanguagePreferences(BaseComponent):
     might be initialized from the user's account settings, but this
     is beyond the scope of this class). So language preferences
     have to be derived from both the HTTP header and the session information.
-    
-    To make things worse, adding the derived language preference to the
-    request isn't sufficient when you use the approach to
-    internationalization that is common in Python, i.e. putting the
-    text to be localized in "_()". If you want to do that in a web
-    server context, the information about the preferred language must
-    be available globally (not just as property of the current request
-    object), so that it can be accessed by whatever
-    function you bind "_" to, and it must be maintained in a thread
-    specific way, because your server may handle several requests
-    concurrently. 
-    
-    This class filters the requests and derives the language preferences
-    from the HTTP headers and the session information. The information
-    is kept in thread local storage and can be accessed with the
-    class method :meth:`preferred`.
     """
     
     channel = "web"
@@ -42,19 +25,21 @@ class LanguagePreferences(BaseComponent):
     _SESSION_KEY = "circuits_bricks.web.LanguagePreferences"
 
     _cache = dict()
-    _thread_data = threading.local()
 
-    @handler("request", filter=True, priority=9)
-    # Priority must be less than Sessions' priority
-    def _on_request(self, event, request, response, peer_cert=None):
+    @classmethod
+    def preferred(cls, request):
+        """
+        Return the language preferences as derived from the request
+        and the preference stored in the session.
+        """
         langs = None
         session = getattr(request, "session", None)
         if session:
-            langs = session.get(self._SESSION_KEY, None)
+            langs = session.get(cls._SESSION_KEY, None)
         if not langs:
             langdefs = request.headers.get("Accept-Language", "en")
-            if self._cache.has_key(langdefs):
-                langs = self._cache[langdefs]
+            if cls._cache.has_key(langdefs):
+                langs = cls._cache[langdefs]
         if not langs:
             defs = dict()
             for langdef in langdefs.split(","):
@@ -68,16 +53,8 @@ class LanguagePreferences(BaseComponent):
             defslist = defs.items()
             defslist.sort(reverse=True)
             langs = [value for key, value in defslist]
-            self._cache[langdefs] = langs
-        self._thread_data.langs = langs
-
-    @classmethod
-    def preferred(cls):
-        """
-        Return the language preferences as derived from the latest intercepted
-        request.
-        """
-        return getattr(cls._thread_data, "langs", ["en"])
+            cls._cache[langdefs] = langs
+        return langs
     
     @classmethod
     def override_accept(cls, session, languages):
@@ -91,46 +68,29 @@ class LanguagePreferences(BaseComponent):
         if not isinstance(languages, list):
             languages = [languages]
         session[cls._SESSION_KEY] = languages
-        cls._thread_data.langs = languages
 
 
 class ThemeSelection(BaseComponent):
     """
-    Localization may sometimes be dependent on the selected theme. In order
-    to support the "_()" approach to localization
-    (see :class:`circuits_bricks.web.LanguagePreferences`) the selected
-    theme must therefore also be available as a global but thread local
-    information.
-    
-    This class filters the theme setting from the session information
-    associated with a request and makes it available.
+    This is just a small wrapper for handling the theme selection
+    in the session.
     """
 
     channel = "web"
 
     _THEME_KEY = "circuits_bricks.web.ThemeSelection"
-    _thread_data = threading.local()
-
-    def __init__(self, *args, **kwargs):
-        super(ThemeSelection, self).__init__(*args, **kwargs)
-        self._default_theme = kwargs.get("default", "default")
-
-    @handler("request", filter=True, priority=9)
-    # Priority must be less than Sessions' priority
-    def _on_request(self, event, request, response, peer_cert=None):
-        session = getattr(request, "session", None)
-        if session:
-            self._thread_data.theme \
-                = session.get(self._THEME_KEY, self._default_theme)
-        else:
-            self._thread_data.theme = self._default_theme
+    _default_theme = "default"
 
     @classmethod
-    def selected(cls):
+    def set_default(cls, theme):
+        cls._default_theme = theme
+
+    @classmethod
+    def selected(cls, session):
         """
         Return the selected theme.
         """
-        return getattr(cls._thread_data, "theme", "default")
+        return session.get(cls._THEME_KEY, cls._default_theme)
 
     @classmethod
     def select(cls, session, theme):
@@ -139,4 +99,3 @@ class ThemeSelection(BaseComponent):
         """
         session[cls._THEME_KEY] = theme
         cls._thread_data.theme = theme
-        
