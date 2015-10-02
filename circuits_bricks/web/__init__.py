@@ -8,4 +8,4 @@
 
 from .client import Client
 
-from .filters import LanguagePreferences, ThemeSelection
+from .misc import LanguagePreferences, ThemeSelection
