@@ -1,7 +1,7 @@
 """
 ..
    This file is part of the circuits bricks component library.
-   Copyright (C) 2012 Michael N. Lipp
+   Copyright (C) 2012-2015 Michael N. Lipp
 
 .. moduleauthor:: mnl
 """
@@ -26,21 +26,28 @@ class LanguagePreferences(BaseComponent):
 
     _cache = dict()
 
+    @handler("request", priority=9)
+    # Priority must be less than Sessions' priority
+    def _on_request(self, event, request, response, peer_cert=None):
+        self.update(request)
+        
     @classmethod
-    def preferred(cls, request):
+    def update(cls, request):
         """
         Return the language preferences as derived from the request
         and the preference stored in the session.
         """
-        langs = None
-        session = getattr(request, "session", None)
-        if session:
-            langs = session.get(cls._SESSION_KEY, None)
-        if not langs:
-            langdefs = request.headers.get("Accept-Language", "en")
-            if cls._cache.has_key(langdefs):
-                langs = cls._cache[langdefs]
-        if not langs:
+        session = getattr(request, "session")
+        # Highest priority: override setting from session
+        if not session is None:
+            langs = session.get(cls._SESSION_KEY + ".overridden")
+            if not langs is None:
+                return langs
+        # Next, try accept header
+        langdefs = request.headers.get("Accept-Language", "en")
+        if cls._cache.has_key(langdefs):
+            langs = cls._cache[langdefs]
+        else:
             defs = dict()
             for langdef in langdefs.split(","):
                 langparts = langdef.split(";", 1)
@@ -52,8 +59,10 @@ class LanguagePreferences(BaseComponent):
                 defs[q] = lang
             defslist = defs.items()
             defslist.sort(reverse=True)
-            langs = [value for key, value in defslist]
+            langs = [value for _, value in defslist]
             cls._cache[langdefs] = langs
+        if not session is None:
+            session[cls._SESSION_KEY + ".cached"] = langs
         return langs
     
     @classmethod
@@ -67,7 +76,12 @@ class LanguagePreferences(BaseComponent):
         """
         if not isinstance(languages, list):
             languages = [languages]
-        session[cls._SESSION_KEY] = languages
+        session[cls._SESSION_KEY + ".overridden"] = languages
+
+    @classmethod
+    def preferred(cls, session):
+        return session.get(cls._SESSION_KEY + ".overridden") \
+            or session.get(cls._SESSION_KEY + ".cached")
 
 
 class ThemeSelection(BaseComponent):
