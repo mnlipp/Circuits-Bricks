@@ -35,7 +35,7 @@ class LanguagePreferences(BaseComponent):
     def update(cls, request):
         """
         Return the language preferences as derived from the request
-        and the preference stored in the session.
+        and (possibly) a cookie and the preference stored in the session.
         """
         session = getattr(request, "session")
         # Highest priority: override setting from session
@@ -43,41 +43,50 @@ class LanguagePreferences(BaseComponent):
             langs = session.get(cls._SESSION_KEY + ".overridden")
             if not langs is None:
                 return langs
-        # Next, try accept header
-        langdefs = request.headers.get("Accept-Language", "en")
-        if cls._cache.has_key(langdefs):
-            langs = cls._cache[langdefs]
+        # Next try cookie
+        from_cookie =  None # [when #135 is fixed:] request.cookie.get(cls._SESSION_KEY)
+        if from_cookie:
+            langs = from_cookie.value.split(":")
         else:
-            defs = dict()
-            for langdef in langdefs.split(","):
-                langparts = langdef.split(";", 1)
-                lang = langparts[0].replace("-", "_")
-                q = 1
-                if len(langparts) > 1:
-                    qparts = langparts[1].split("=")
-                    q = float(qparts[1])
-                defs[q] = lang
-            defslist = defs.items()
-            defslist.sort(reverse=True)
-            langs = [value for _, value in defslist]
-            cls._cache[langdefs] = langs
+            # Next, try accept header
+            langdefs = request.headers.get("Accept-Language", "en")
+            if cls._cache.has_key(langdefs):
+                langs = cls._cache[langdefs]
+            else:
+                defs = dict()
+                for langdef in langdefs.split(","):
+                    langparts = langdef.split(";", 1)
+                    lang = langparts[0].replace("-", "_")
+                    q = 1
+                    if len(langparts) > 1:
+                        qparts = langparts[1].split("=")
+                        q = float(qparts[1])
+                    defs[q] = lang
+                defslist = defs.items()
+                defslist.sort(reverse=True)
+                langs = [value for _, value in defslist]
+                cls._cache[langdefs] = langs
         if not session is None:
             session[cls._SESSION_KEY + ".cached"] = langs
         return langs
     
     @classmethod
-    def override_accept(cls, session, languages):
+    def override_accept(cls, session, languages, response=None):
         """
         Set the language preferences for the given session, thus overriding
         the preferences given in the HTTP header.
         
-        :param session: the session.
+        :param session: the session. 
         :param languages: a list of language identifiers.
+        :param response: if not None, the preference will also be
+                saved as a cookie.
         """
         if not isinstance(languages, list):
             languages = [languages]
         session[cls._SESSION_KEY + ".overridden"] = languages
-
+        if not response is None:
+            pass # [when #135 is fixed:] response.cookie[cls._SESSION_KEY] = ":".join(languages)
+ 
     @classmethod
     def preferred(cls, session):
         return session.get(cls._SESSION_KEY + ".overridden") \
