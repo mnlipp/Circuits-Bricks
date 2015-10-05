@@ -9,7 +9,7 @@ Miscellaneous classes
 .. toctree::
    :maxdepth: 1
 
-.. autoclass:: circuits_bricks.misc.ComponentQuery
+.. autoclass:: circuits_bricks.misc.component_query
    :members:
    
 .. autoclass:: circuits_bricks.misc.Queryable

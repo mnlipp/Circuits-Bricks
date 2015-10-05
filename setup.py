@@ -29,8 +29,6 @@ setup(
               'circuits_bricks.core',
               'circuits_bricks.misc', 
               'circuits_bricks.net', 
-              'circuits_bricks.net.protocols', 
               'circuits_bricks.web', 
-              'circuits_bricks.web.dispatchers', 
               'tests'],
 )

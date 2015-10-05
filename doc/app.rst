@@ -17,7 +17,7 @@ Logging
 .. autoclass:: circuits_bricks.app.Logger
    :members:
 
-.. autoclass:: circuits_bricks.app.Log
+.. autoclass:: circuits_bricks.app.log
    :members:
 
 .. autoclass:: circuits_bricks.app.LogSupport
@@ -29,10 +29,10 @@ Configuration
 .. autoclass:: circuits_bricks.app.Configuration
    :members:
 
-.. autoclass:: circuits_bricks.app.ConfigValue
+.. autoclass:: circuits_bricks.app.config_value
    :members:
 
-.. autoclass:: circuits_bricks.app.EmitConfig
+.. autoclass:: circuits_bricks.app.emit_config
    :members:
 
 Application
