@@ -50,7 +50,7 @@ class log(Event):
         except ValueError:
             pass
 
-class LogSupport:
+class LogSupport(object):
     """
     While using :class:`log` events fits nicely in the event based framework, 
     it has the drawback of delaying log messages. As the log events are 
