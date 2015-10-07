@@ -6,4 +6,4 @@
 .. moduleauthor:: mnl
 """
 
-from .version import version as __version__
+version = "0.4.1"

@@ -1,5 +1,8 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
+from imp import new_module
+from os import path
+from posix import getcwd
 
 # Utility function to read the README file.
 # Used for the long_description.  It's nice, because now 1) we have a top level
@@ -8,11 +11,30 @@ from setuptools import setup
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-import circuits_bricks
+version = new_module("version")
+
+exec(
+    compile(
+        open(
+            path.join(
+                path.dirname(
+                    globals().get(
+                        "__file__",
+                        path.join(getcwd(), "circuits_bricks")
+                    )
+                ),
+                "circuits_bricks/version.py"
+            ),
+            "r"
+        ).read(),
+        "circuits_bricks/version.py", "exec"
+    ),
+    version.__dict__
+)
 
 setup(
     name = "circuits-bricks",
-    version = circuits_bricks.__version__,
+    version = version.version,
     author = "Michael N. Lipp",
     author_email = "mnl@mnl.de",
     description = ("General purpose components extending the circuits framework."),
@@ -24,11 +46,5 @@ setup(
         "Development Status :: 3 - Alpha",
         "License :: OSI Approved :: MIT License",
     ],
-    packages=['circuits_bricks', 
-              'circuits_bricks.app', 
-              'circuits_bricks.core',
-              'circuits_bricks.misc', 
-              'circuits_bricks.net', 
-              'circuits_bricks.web', 
-              'tests'],
+    packages=find_packages("."),
 )
