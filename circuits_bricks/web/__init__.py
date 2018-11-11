@@ -6,6 +6,7 @@
 .. moduleauthor:: mnl
 """
 
+from .dispatchers.dispatcher import ScopedChannel, ScopeDispatcher
 from .client import Client
 
 from .misc import LanguagePreferences, ThemeSelection
