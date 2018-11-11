@@ -85,7 +85,7 @@ class Client(BaseComponent):
             self.fire(connect(self._host, self._port, self._secure),
                       self._transport)
 
-    def _send_request(self, method, url, body=None, headers={}, timeout=None):
+    def _send_request(self, method, url, body=None, headers=None, timeout=None):
         p = urlparse(url)
         if p.hostname and p.hostname != self._host \
             or p.scheme == "http" and self._secure \
@@ -97,7 +97,10 @@ class Client(BaseComponent):
         resource = p.path
         if p.query:
             resource += "?" + p.query
-        headers = Headers([(k, v) for k, v in headers.items()])
+        if headers is None:
+            headers = Headers([])
+        else:
+            headers = Headers([(k, v) for k, v in headers.items()])
         # Clients MUST include Host header in HTTP/1.1 requests (RFC 2616)
         if not headers.has_key("Host"):
             headers["Host"] = self._host \
