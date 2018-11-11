@@ -47,4 +47,5 @@ setup(
         "License :: OSI Approved :: MIT License",
     ],
     packages=find_packages("."),
+    install_requires = ['circuits==3.2'],
 )
